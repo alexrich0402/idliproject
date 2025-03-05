@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TalentShield - Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+        :root {
+            --primary-color: #0A1128;
+            --secondary-color: #001F54;
+            --accent-color: #034078;
+            --accent-glow: #1282A2;
+            --text-color: #FEFCFB;
+            --background-color: #030B1B;
+            --card-bg: rgba(1, 22, 39, 0.95);
+            --sidebar-width: 280px;
+            --header-height: 80px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--background-color);
+            font-family: 'Space Grotesk', sans-serif;
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+            width: var(--sidebar-width);
+            padding: var(--header-height) 24px 40px;
+            position: fixed;
+            height: 100%;
+            left: -280px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            border-right: 1px solid rgba(18, 130, 162, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .sidebar:hover,
+        .sidebar.active {
+            left: 0;
+        }
+
+        .logo {
+            color: var(--text-color);
+            font-size: 28px;
+            font-weight: 700;
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: var(--sidebar-width);
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary-color);
+            z-index: 1001;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid rgba(18, 130, 162, 0.2);
+            text-shadow: 0 0 15px var(--accent-glow);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .sidebar:hover .logo,
+        .sidebar.active .logo {
+            left: 0;
+        }
+
+        .sidebar-toggle {
+            position: absolute;
+            right: -16px;
+            top: calc(var(--header-height) + 20px);
+            background: var(--accent-color);
+            border: none;
+            color: var(--text-color);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(18, 130, 162, 0.5);
+        }
+
+        .sidebar-toggle:hover {
+            background: var(--accent-glow);
+            box-shadow: 0 0 20px rgba(18, 130, 162, 0.8);
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            color: var(--text-color);
+            text-decoration: none;
+            padding: 16px 20px;
+            margin: 4px 0;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-size: 15px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            border: 1px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: rgba(18, 130, 162, 0.1);
+            border: 1px solid rgba(18, 130, 162, 0.2);
+            box-shadow: 0 0 15px rgba(18, 130, 162, 0.2);
+        }
+
+        .nav-item i {
+            margin-right: 16px;
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .main-content {
+            margin-left: 0;
+            padding: var(--header-height) 40px 40px;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+
+        .sidebar:hover + .main-content,
+        .main-content.expanded {
+            margin-left: var(--sidebar-width);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .dashboard-card {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 16px;
+            border: 1px solid rgba(18, 130, 162, 0.2);
+        }
+
+        .dashboard-card h3 {
+            font-size: 18px;
+            margin-bottom: 16px;
+            color: rgba(254, 252, 251, 0.9);
+        }
+
+        .score {
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #FEFCFB, #1282A2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .candidates-table {
+            width: 100%;
+            background: var(--card-bg);
+            border-radius: 16px;
+            border: 1px solid rgba(18, 130, 162, 0.2);
+            overflow: hidden;
+        }
+
+        .candidates-table th,
+        .candidates-table td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid rgba(18, 130, 162, 0.2);
+        }
+
+        .candidates-table th {
+            background: rgba(3, 64, 120, 0.5);
+            font-weight: 600;
+        }
+
+        .candidates-table tr:hover {
+            background: rgba(18, 130, 162, 0.1);
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .status-high {
+            background: rgba(46, 213, 115, 0.2);
+            color: #2ed573;
+        }
+
+        .status-medium {
+            background: rgba(255, 171, 0, 0.2);
+            color: #ffab00;
+        }
+
+        .status-low {
+            background: rgba(255, 71, 87, 0.2);
+            color: #ff4757;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                left: 0;
+                transform: translateX(-100%);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">TalentShield</div>
+        <button class="sidebar-toggle" onclick="toggleSidebar()">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <nav>
+            <a href="candidate.html" class="nav-item">
+                <i class="fas fa-home"></i>
+                <span class="nav-text">Candidate</span>
+            </a>
+            <a href="" class="nav-item">
+                <i class="fas fa-cube"></i>
+                <span class="nav-text">Shortlisted</span>
+            </a>
+            <a href="dashboard.html" class="nav-item">
+                <i class="fas fa-folder"></i>
+                <span class="nav-text">Dashboard</span>
+            </a>
+            <a href="login.html" class="nav-item">
+                <i class="fas fa-folder"></i>
+                <span class="nav-text">Logout</span>
+            </a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="dashboard-grid">
+            <div class="dashboard-card">
+                <h3>Total Candidates</h3>
+                <div class="score">248</div>
+            </div>
+            <div class="dashboard-card">
+                <h3>Average Match Score</h3>
+                <div class="score">87.5%</div>
+            </div>
+            <div class="dashboard-card">
+                <h3>Processed Today</h3>
+                <div class="score">34</div>
+            </div>
+        </div>
+
+        <table class="candidates-table">
+            <thead>
+                <tr>
+                    <th>Candidate Name</th>
+                    <th>Position</th>
+                    <th>Match Score</th>
+                    <th>Skills Match</th>
+                    <th>Experience Match</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Suresh kumar</td>
+                    <td>Senior Developer</td>
+                    <td>95%</td>
+                    <td>High</td>
+                    <td>8+ years</td>
+                    <td><span class="status-badge status-high">High Match</span></td>
+                </tr>
+                <tr>
+                    <td>Rohit kholi</td>
+                    <td>UX Designer</td>
+                    <td>82%</td>
+                    <td>Medium</td>
+                    <td>5 years</td>
+                    <td><span class="status-badge status-medium">Medium Match</span></td>
+                </tr>
+                <tr>
+                    <td>Abid Richard</td>
+                    <td>Product Manager</td>
+                    <td>78%</td>
+                    <td>Medium</td>
+                    <td>4 years</td>
+                    <td><span class="status-badge status-medium">Medium Match</span></td>
+                </tr>
+                <tr>
+                    <td>Tigga Ahmed</td>
+                    <td>DevOps Engineer</td>
+                    <td>65%</td>
+                    <td>Low</td>
+                    <td>2 years</td>
+                    <td><span class="status-badge status-low">Low Match</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+
+            sidebar.classList.toggle('active');
+            mainContent.classList.toggle('expanded');
+        }
+    </script>
+</body>
+</html>
