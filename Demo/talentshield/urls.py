@@ -1,5 +1,6 @@
 from django.urls import path
-from .views import index, resume, upload, option, signup, results, profile, login, candidate, hrmanager, dashboard
+from .import views
+from .views import index, resume, upload, option, signup, results, profile, login, candidate, hrmanager, dashboard,signup_view, login_view, logout_view
 
 urlpatterns = [
     path('', index, name='talentShield'),
@@ -13,4 +14,7 @@ urlpatterns = [
     path('candidate.html', candidate, name='candidatepage'),
     path('hrmanager.html', hrmanager, name='hrmanagerpage'),
     path('dashboard.html', dashboard, name='dashboardpage'),
+    path('signup/', signup_view, name='signup'),
+    path('login/', login_view, name='login'),
+    path('logout/', logout_view, name='logout'),
 ]
